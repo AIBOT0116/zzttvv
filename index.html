@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<!-- aap ka hi intezar tha -->
+
+<head>
+    <title>Zee Tv - FreeStream</title>
+    <!-- Favicon (Browser Tabs) -->
+    <link rel="icon" type="image/png" sizes="16x16" href="https://i.ibb.co/Z1XsKdhS/ztvlogo.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://i.ibb.co/Z1XsKdhS/ztvlogo.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="https://i.ibb.co/Z1XsKdhS/ztvlogo.png">
+
+    <!-- Apple Touch Icon (iPhone/iPad Home Screen) -->
+    <link rel="apple-touch-icon" sizes="180x180" href="https://i.ibb.co/Z1XsKdhS/ztvlogo.png">
+
+    <!-- Android/Chrome (PWA Install Icon) -->
+    <link rel="icon" type="image/png" sizes="192x192" href="https://i.ibb.co/Z1XsKdhS/ztvlogo.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="https://i.ibb.co/Z1XsKdhS/ztvlogo.png">
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <script src="https://cdn.jsdelivr.net/npm/shaka-player/dist/shaka-player.ui.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/shaka-player/dist/controls.min.css" rel="stylesheet">
+    <style>
+        .shaka-overflow-menu,
+        .shaka-settings-menu {
+            background-color: rgba(0, 0, 0, 0.64);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+        }
+
+        .shaka-overflow-menu button:hover,
+        .shaka-settings-menu button:hover {
+            background-color: rgba(255, 255, 255, 0.1)
+        }
+
+        .shaka-spinner svg {
+            stroke: #fff
+        }
+
+        .shaka-controls-container[casting=true] .shaka-overflow-menu,
+        .shaka-controls-container[casting=true] .shaka-settings-menu,
+        .shaka-controls-container[shown=true] .shaka-overflow-menu,
+        .shaka-controls-container[shown=true] .shaka-settings-menu {
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.2) transparent
+        }
+
+        .shaka-controls-container[casting=true] .shaka-overflow-menu::-webkit-scrollbar,
+        .shaka-controls-container[casting=true] .shaka-settings-menu::-webkit-scrollbar,
+        .shaka-controls-container[shown=true] .shaka-overflow-menu::-webkit-scrollbar,
+        .shaka-controls-container[shown=true] .shaka-settings-menu::-webkit-scrollbar {
+            width: 6px
+        }
+
+        .shaka-controls-container[casting=true] .shaka-overflow-menu::-webkit-scrollbar-track,
+        .shaka-controls-container[casting=true] .shaka-settings-menu::-webkit-scrollbar-track,
+        .shaka-controls-container[shown=true] .shaka-overflow-menu::-webkit-scrollbar-track,
+        .shaka-controls-container[shown=true] .shaka-settings-menu::-webkit-scrollbar-track {
+            background: 0 0
+        }
+
+        .shaka-controls-container[casting=true] .shaka-overflow-menu::-webkit-scrollbar-thumb,
+        .shaka-controls-container[casting=true] .shaka-settings-menu::-webkit-scrollbar-thumb,
+        .shaka-controls-container[shown=true] .shaka-overflow-menu::-webkit-scrollbar-thumb,
+        .shaka-controls-container[shown=true] .shaka-settings-menu::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, .2);
+            border-radius: 4px
+        }
+
+        .shaka-controls-container[casting=true] .shaka-overflow-menu::-webkit-scrollbar-thumb:hover,
+        .shaka-controls-container[casting=true] .shaka-settings-menu::-webkit-scrollbar-thumb:hover,
+        .shaka-controls-container[shown=true] .shaka-overflow-menu::-webkit-scrollbar-thumb:hover,
+        .shaka-controls-container[shown=true] .shaka-settings-menu::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(255, 255, 255, .3)
+        }
+
+        .text-overlay,
+        .views {
+            position: absolute;
+            right: 40px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .text-overlay {
+            top: 40px;
+            font-size: 20px;
+            color: rgb(255 255 255);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .text-overlay span {
+            font-size: 12px;
+            background-color: rgba(255, 255, 255, .3);
+            padding: 3px 5px;
+            border-radius: 3px;
+        }
+
+        .views {
+            top: 67px;
+            color: rgba(255, 255, 255, .9);
+            font-size: 15px;
+        }
+
+        @media only screen and (min-width:320px) and (max-width:940px) {
+
+            .text-overlay,
+            .views {
+                right: 25px;
+                opacity: .8;
+            }
+
+            .text-overlay {
+                top: 7px;
+                font-size: 13px;
+                gap: 2px;
+            }
+
+            .text-overlay span {
+                font-size: 9px;
+            }
+
+            .views {
+                font-size: 11px;
+                top: 24px;
+            }
+        }
+
+        @media only screen and (min-width:450px) and (max-width:940px) {
+            .shaka-play-button {
+                padding: calc(12% / 3);
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+
+<body bgcolor="black" style="margin:0">
+    <div data-shaka-player-container style="position:absolute;top:0;left:0;width:100%;height:100%">
+        <video autoplay playsinline tabindex="0" data-shaka-player id="video"
+            poster="https://akamaividz2.zee5.com/image/upload/w_1349,h_759,c_scale,f_webp,q_auto:eco/resources/0-9-zeetv/list/1920x1080listb9f9838f0ef34ac19ad1dd848ca976b6.jpg"
+            style="width:100%;height:100%"></video>
+        <div class="text-overlay">FreeStream<span>Live</span></div>
+        <div class="views"><span id="view">1.01</span>Cr Views</div>
+    </div>
+    <script>
+        function _0xdnd1(str) {
+            try {
+                str = str.replace(/-/g, '+').replace(/_/g, '/');
+                while (str.length % 4 !== 0) str += '=';
+                return atob(str);
+            } catch {
+                return null;
+            }
+        }
+
+        async function _0x4f5a() {
+            try {
+                const res = await fetch('https://pb.oii.im/xrp4');
+                const data = await res.json();
+
+                const decoded = _0xdnd1(data._0x1s4T);
+                if (!decoded) throw new Error("Invalid decode");
+
+                const [url, query] = decoded.split('?');
+                const params = new URLSearchParams(query);
+
+                const drm = params.get('drmLicense');
+                const [lock, key] = drm.split(':');
+
+                return { baseurl: url, lock, key };
+            } catch {
+                alert("Stream info could not be loaded.");
+                return null;
+            }
+        }
+
+        async function init() {
+            const info = await _0x4f5a();
+            if (!info) return;
+
+            const { baseurl, lock, key } = info;
+
+            const video = document.getElementById("video");
+            const ui = video.ui;
+            const controls = ui.getControls();
+            const player = controls.getPlayer();
+
+            // Streaming & DRM configuration
+            player.configure({
+                drm: {
+                    clearKeys: {
+                        [lock]: key
+                    }
+                },
+                streaming: {
+                    ignoreTextStreamFailures: true,
+                    rebufferingGoal: 2,
+                    bufferingGoal: 30,
+                    bufferBehind: 60,
+                    inaccurateManifestTolerance: 0.3,
+                    stallEnabled: false
+                },
+                manifest: {
+                    dash: {
+                        ignoreMinBufferTime: true,
+                        autoCorrectDrift: true
+                    }
+                }
+            });
+            // UI configuration
+            ui.configure({
+                controlPanelElements: ["play_pause", "mute", "volume", "spacer", "time_and_duration", "quality", "fullscreen", "overflow_menu"],
+                seekBarColors: {
+                    base: 'rgba(100, 100, 100, 0.6)',
+                    buffered: 'rgba(200, 200, 200, 0.7)',
+                    played: 'rgba(229, 9, 20, 1)'
+                },
+                // Add Quality Marks
+                qualityMarks: {
+                    '720': 'HD',
+                    '1080': 'FHD',
+                    '1440': '2K',
+                    '2160': '4K',
+                    '4320': '8K',
+                },
+                enableKeyboardPlaybackControls: true
+            });
+            // Expose for debugging
+            window.player = player;
+            window.ui = ui;
+            // Error handling
+            player.addEventListener("error", onPlayerErrorEvent);
+            controls.addEventListener("error", onUIErrorEvent);
+            // Load the video
+            try {
+                await player.load(baseurl);
+                console.log("The video has now been loaded instantly!");
+            } catch (error) {
+                onPlayerError(error);
+                alert("Video not loaded.");
+            }
+        }
+
+        function onPlayerErrorEvent(event) {
+            onPlayerError(event.detail);
+        }
+
+        function onPlayerError(error) {
+            console.error("Player Error - Code:", error.code, "Details:", error);
+        }
+
+        function onUIErrorEvent(event) {
+            onPlayerError(event.detail);
+        }
+
+        function initFailed(error) {
+            console.error("Unable to load the Shaka UI library!", error);
+        }
+        // Auto-init when Shaka UI is ready
+        document.addEventListener("shaka-ui-loaded", init);
+        document.addEventListener("shaka-ui-load-failed", initFailed);
+
+        function updateViews() {
+            const min = 1.01;
+            const max = 1.99;
+            const views = (Math.random() * (max - min) + min).toFixed(2);
+            document.getElementById('view').textContent = views;
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            updateViews();
+            setInterval(updateViews, 5000);
+        });
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then((reg) => console.log('Service Worker registered!', reg))
+                .catch((err) => console.error('Service Worker registration failed:', err));
+        }
+    </script>
+</body>
+
+</html>
