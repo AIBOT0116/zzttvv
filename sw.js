@@ -71,7 +71,8 @@ self.addEventListener("fetch", (event) => {
                     const preload = await event.preloadResponse;
                     if (preload) return preload;
 
-                    return await fetch(req);
+                    return await fetch(req, { redirect: "follow" });
+
                 } catch (error) {
                     const cache = await caches.open(OFFLINE_CACHE_NAME);
                     const fallback = await cache.match(OFFLINE_URL);
