@@ -4,8 +4,8 @@ const OFFLINE_URL = "/offline.html";
 
 // List of assets to pre-cache
 const STATIC_ASSETS = [
-    "/",
-    "/index.html",
+    // "/",
+    // "/index.html",
     "/manifest.json",
     OFFLINE_URL,
     "https://akamaividz2.zee5.com/image/upload/w_1349,h_759,c_scale,f_webp,q_auto:eco/resources/0-9-zeetv/list/1920x1080listb9f9838f0ef34ac19ad1dd848ca976b6.jpg",
