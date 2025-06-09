@@ -4,7 +4,6 @@ const STATIC_ASSETS = [
     "/index.html",
     "/manifest.json",
     "/offline.html",  // Add your offline fallback page here
-    "https://pb.oii.im/xrp4",
     "https://akamaividz2.zee5.com/image/upload/w_1349,h_759,c_scale,f_webp,q_auto:eco/resources/0-9-zeetv/list/1920x1080listb9f9838f0ef34ac19ad1dd848ca976b6.jpg"
 ];
 
