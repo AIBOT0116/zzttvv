@@ -55,47 +55,63 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
     const req = event.request;
     const url = new URL(req.url);
-    const isSameOrigin = url.origin === location.origin;
-    const isStaticAsset = /\.(html|css|js|json|png|jpg|jpeg|svg|webp)$/.test(url.pathname);
-    const isCDNAsset = STATIC_ASSETS.includes(url.href);
     const isNavigation = req.mode === "navigate";
+    const isSameOrigin = url.origin === self.location.origin;
+    const isCDNAsset = STATIC_ASSETS.includes(url.href);
 
     // Only handle GET requests
     if (req.method !== "GET") return;
 
     event.respondWith(
         (async () => {
-            // Navigation requests
-            if (isNavigation) {
-                try {
-                    const preload = await event.preloadResponse;
-                    if (preload) return preload;
-
-                    // ✅ Special case: if URL is "/offline", treat it as "/offline.html"
+            try {
+                // ✅ Handle navigation requests (page loads)
+                if (isNavigation) {
+                    // Special case: treat "/offline" as "/offline.html"
                     if (url.pathname === "/offline") {
-                        const cache = await caches.open(OFFLINE_CACHE_NAME);
-                        const fallback = await cache.match(OFFLINE_URL); // '/offline.html'
+                        const offlineCache = await caches.open(OFFLINE_CACHE_NAME);
+                        const fallback = await offlineCache.match(OFFLINE_URL);
                         return fallback || new Response("Offline fallback not found", { status: 503 });
                     }
 
-                    // ✅ Regular fetch for navigation, with redirect explicitly allowed
+                    // Try using preload response if available
+                    const preload = await event.preloadResponse;
+                    if (preload) return preload;
+
                     const response = await fetch(req, { redirect: "follow" });
 
-                    // Check for redirect/invalid response (edge case)
                     if (!response || response.type === "opaqueredirect") {
                         throw new Error("Redirect or opaque response");
                     }
 
                     return response;
-                } catch (error) {
+                }
+
+                // ✅ Handle static or CDN assets
+                if (isSameOrigin || isCDNAsset) {
+                    const cached = await caches.match(req);
+                    if (cached) return cached;
+
+                    const response = await fetch(req);
+                    const cache = await caches.open(STATIC_CACHE_NAME);
+                    cache.put(req, response.clone());
+                    return response;
+                }
+
+                // ✅ All other requests (e.g. cross-origin API)
+                return await fetch(req);
+
+            } catch (err) {
+                // ✅ Fallback to offline page for navigation errors
+                if (isNavigation) {
                     const cache = await caches.open(OFFLINE_CACHE_NAME);
                     const fallback = await cache.match(OFFLINE_URL);
-                    return fallback || new Response("Offline page not found", { status: 503 });
+                    return fallback || new Response("Offline fallback not available", { status: 503 });
                 }
-            }
 
-            // Default fallback
-            return fetch(req);
+                // For non-navigation requests, just return a 503
+                return new Response("Network error", { status: 503 });
+            }
         })()
     );
 });
