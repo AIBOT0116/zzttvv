@@ -71,28 +71,26 @@ self.addEventListener("fetch", (event) => {
                     const preload = await event.preloadResponse;
                     if (preload) return preload;
 
-                    return await fetch(req, { redirect: "follow" });
+                    // ✅ Special case: if URL is "/offline", treat it as "/offline.html"
+                    if (url.pathname === "/offline") {
+                        const cache = await caches.open(OFFLINE_CACHE_NAME);
+                        const fallback = await cache.match(OFFLINE_URL); // '/offline.html'
+                        return fallback || new Response("Offline fallback not found", { status: 503 });
+                    }
 
+                    // ✅ Regular fetch for navigation, with redirect explicitly allowed
+                    const response = await fetch(req, { redirect: "follow" });
+
+                    // Check for redirect/invalid response (edge case)
+                    if (!response || response.type === "opaqueredirect") {
+                        throw new Error("Redirect or opaque response");
+                    }
+
+                    return response;
                 } catch (error) {
                     const cache = await caches.open(OFFLINE_CACHE_NAME);
                     const fallback = await cache.match(OFFLINE_URL);
-                    return fallback || Response.error();
-                }
-            }
-
-            // Static or CDN asset requests
-            if (isSameOrigin || isCDNAsset) {
-                const cached = await caches.match(req);
-                if (cached) return cached;
-
-                try {
-                    const response = await fetch(req);
-                    const cache = await caches.open(STATIC_CACHE_NAME);
-                    cache.put(req, response.clone());
-                    return response;
-                } catch (err) {
-                    const cache = await caches.open(OFFLINE_CACHE_NAME);
-                    return await cache.match(OFFLINE_URL);
+                    return fallback || new Response("Offline page not found", { status: 503 });
                 }
             }
 
