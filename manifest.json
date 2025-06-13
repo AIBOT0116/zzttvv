@@ -14,12 +14,7 @@
             "type": "image/png"
         },
         {
-            "src": "https://i.ibb.co/Z1XsKdhS/ztvlogo.png",
-            "sizes": "512x512",
-            "type": "image/png"
-        },
-        {
-            "src": "https://i.ibb.co/FbzvxFws/icon-512x512-maskable.png",
+            "src": "https://i.ibb.co/xKD63G87/ztvlogo-corner.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"
