@@ -1,12 +1,12 @@
 {
-    "name": "Z Tv Free Video Player",
+    "name": "Z Tv FreeStream",
     "short_name": "Z tv FreeStream",
     "description": "A free, live-stream video player.",
     "start_url": "/",
     "display": "standalone",
-    "background_color": "#f58920",
-    "theme_color": "#f58920",
-    "orientation": "any",
+    "background_color": "#222",
+    "theme_color": "#000",
+    "orientation": "natural",
     "icons": [
         {
             "src": "https://i.ibb.co/Z1XsKdhS/ztvlogo.png",
@@ -14,9 +14,10 @@
             "type": "image/png"
         },
         {
-            "src": "https://i.ibb.co/Z1XsKdhS/ztvlogo.png",
+            "src": "https://i.ibb.co/FbzvxFws/icon-512x512-maskable.png",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "maskable"
         }
     ]
 }
