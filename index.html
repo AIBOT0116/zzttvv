@@ -137,6 +137,82 @@
                 padding: calc(12% / 3);
             }
         }
+
+        #toast {
+            position: fixed;
+            inset-inline-start: 25px;
+            top: -70px;
+            display: inline-flex;
+            align-items: center;
+            text-align: center;
+            justify-content: center;
+            z-index: 99;
+            background: rgba(0, 0, 0, 0.64);
+            color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            font-size: 14px;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            border-radius: 3px;
+            padding: 13px 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: 0.3s;
+            animation: 5s forwards slideFromTop;
+            -webkit-animation: 5s forwards slideFromTop
+        }
+
+        @media screen and (max-width:500px) {
+            #toast {
+                inset-inline-start: 0px;
+                inset-inline-end: 0px;
+                margin-top: -25px;
+                justify-content: start;
+                text-align: start;
+                font-size: 15px;
+                padding: 15px 24px;
+                border-radius: 0
+            }
+        }
+
+        @keyframes slideFromTop {
+            0% {
+                opacity: 0;
+                top: -70px
+            }
+
+            10%,
+            50%,
+            90% {
+                opacity: 1;
+                top: 24px
+            }
+
+            100% {
+                opacity: 0;
+                top: -70px;
+                visibility: hidden
+            }
+        }
+
+        @-webkit-keyframes slideFromTop {
+            0% {
+                opacity: 0;
+                top: -70px
+            }
+
+            10%,
+            50%,
+            90% {
+                opacity: 1;
+                top: 24px
+            }
+
+            100% {
+                opacity: 0;
+                top: -70px;
+                visibility: hidden
+            }
+        }
     </style>
 </head>
 
@@ -148,6 +224,9 @@
         <div class="text-overlay">FreeStream<span>Live</span></div>
         <div class="views"><span id="view">1.01</span>Cr Views</div>
     </div>
+
+    <div id="toast">You are online!</div>
+
     <script>
         function _0xdnd1(str) {
             try {
@@ -276,6 +355,28 @@
             updateViews();
             setInterval(updateViews, 5000);
         });
+
+        // Show online/offline toast
+        function showToast(status) {
+            const toast = document.getElementById("toast");
+            toast.textContent = status === 'online' ? 'You are online!' : 'You are offline!';
+            toast.className = status;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // Event listeners for online and offline events
+        window.addEventListener('online', () => showToast('online'));
+        window.addEventListener('offline', () => showToast('offline'));
+
+        // Initial check for online status
+        if (navigator.onLine) {
+            showToast('online');
+        } else {
+            showToast('offline');
+        }
 
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js')
